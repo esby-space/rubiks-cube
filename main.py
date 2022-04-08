@@ -12,7 +12,6 @@ def main() -> None:
     cam = cv.VideoCapture(0)
     ret, img = cam.read()
 
-    print(colors["blue"])
     # calculate coordinates of cube overlay
     margin = 100
     length = img.shape[0] - (2 * margin)
@@ -34,7 +33,7 @@ def main() -> None:
 
         if k % 256 == 32:
             # SPACE pressed
-            color = get_color(img)
+            get_color(img, start_point, end_point)
 
         img = draw_cube(img, start_point, end_point)
         cv.imshow("esby rubik's cube solver :D", img)
@@ -44,11 +43,11 @@ def main() -> None:
     cv.destroyAllWindows()
 
 
-def draw_cube(img, pt1: Tuple[int, int], pt2: Tuple[int, int]):
+def draw_cube(img, start: Tuple[int, int], end: Tuple[int, int]):
     """draws a cube overlay into the image"""
 
-    start_x, start_y = pt1
-    end_x, end_y = pt2
+    start_x, start_y = start
+    end_x, end_y = end
     dif_x = math.ceil((end_x - start_x) / 3)
     dif_y = math.ceil((end_y - start_y) / 3)
 
@@ -60,16 +59,19 @@ def draw_cube(img, pt1: Tuple[int, int], pt2: Tuple[int, int]):
     return img
 
 
-def get_color(img):
+def get_color(img, start: Tuple[int, int], end: Tuple[int, int]):
     """Get rubik's cube color from given image"""
-    # OpenCV uses BGR, ughhh
-    r = img[:, :, 2]
-    g = img[:, :, 1]
-    b = img[:, :, 0]
+    start_x, start_y = start
+    end_x, end_y = end
+    img = img[start_y:end_y, start_x:end_x]
 
-    r = np.mean(r)
-    g = np.mean(g)
-    b = np.mean(b)
+    cv.imshow("og", img)
+    hsv_img = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+    for color in colors:
+        lower = np.array(colors[color][0], np.uint8)
+        upper = np.array(colors[color][1], np.uint8)
+        threshold = cv.inRange(hsv_img, lower, upper)
+        cv.imshow(color, threshold)
 
 
 if __name__ == "__main__":

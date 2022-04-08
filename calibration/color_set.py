@@ -7,7 +7,7 @@ def nothing(x):
 
 
 # Load image
-image = cv2.imread("1.jpg")
+image = cv2.imread("rubik.jpg")
 
 # Create a window
 cv2.namedWindow("image")
@@ -61,6 +61,7 @@ while 1:
             "(hMin = %d , sMin = %d, vMin = %d), (hMax = %d , sMax = %d, vMax = %d)"
             % (hMin, sMin, vMin, hMax, sMax, vMax)
         )
+        print("([%d, %d, %d], [%d , %d, %d])" % (hMin, sMin, vMin, hMax, sMax, vMax))
         phMin = hMin
         psMin = sMin
         pvMin = vMin
