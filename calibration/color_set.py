@@ -1,3 +1,5 @@
+# thank you so much to nathancy!! https://stackoverflow.com/questions/24916870/python-opencv-rubiks-cube-solver-color-extraction
+
 import cv2
 import numpy as np
 

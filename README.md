@@ -4,7 +4,7 @@ a webcam based rubik's cube solver!
 
 ## to calibrate
 
-because every picture of a rubik's cube is different (lighting, color, shades, etc) calibration needs to be done before using it.
+because every picture of a rubik's cube is different (lighting, color, shades, etc) calibration needs to be done before using it.  thank you so much to [nathancy](https://stackoverflow.com/questions/24916870/python-opencv-rubiks-cube-solver-color-extraction) for creating the ui!!
 
 1. take a picture of the rubik's cube in your lighting
 2. rename it `rubik.jpg` and put it in the `calibration` directory
@@ -18,3 +18,8 @@ because every picture of a rubik's cube is different (lighting, color, shades, e
 2. align rubik's cube with the squares on screen
 3. press space bar
 4. (need to implement the rest of it >_>)
+
+### dependencies
+numpy, opencv, and kociemba
+
+`pip install numpy opencv-python kociemba`
