@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Dict
 import kociemba as kc
 import cv2 as cv
 import numpy as np
@@ -21,9 +21,6 @@ def main() -> None:
     # main loop
     while True:
         ret, img = cam.read()
-        if not ret:
-            raise Exception("couldn't grab the frame x_x")
-            break
 
         k = cv.waitKey(1)
         if k % 256 == 27:
@@ -33,7 +30,8 @@ def main() -> None:
 
         if k % 256 == 32:
             # SPACE pressed
-            get_color(img, start_point, end_point)
+            color = get_color(img, start_point, end_point)
+            print(color)
 
         img = draw_cube(img, start_point, end_point)
         cv.imshow("esby rubik's cube solver :D", img)
@@ -59,19 +57,38 @@ def draw_cube(img, start: Tuple[int, int], end: Tuple[int, int]):
     return img
 
 
-def get_color(img, start: Tuple[int, int], end: Tuple[int, int]):
+def get_color(img, start: Tuple[int, int], end: Tuple[int, int]) -> str:
     """Get rubik's cube color from given image"""
     start_x, start_y = start
     end_x, end_y = end
     img = img[start_y:end_y, start_x:end_x]
 
-    cv.imshow("og", img)
+    color_values = get_color_values(img, True)
+
+    main_color: None | str = None
+    largest_value = 0
+    for color, value in color_values.items():
+        if value > largest_value:
+            main_color = color
+            largest_value = value
+
+    return main_color
+
+
+def get_color_values(img, show_windows=False) -> Dict[str, int]:
     hsv_img = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+    color_values: Dict[str, int] = {}
+
     for color in colors:
         lower = np.array(colors[color][0], np.uint8)
         upper = np.array(colors[color][1], np.uint8)
         threshold = cv.inRange(hsv_img, lower, upper)
-        cv.imshow(color, threshold)
+        color_values[color] = threshold.sum()
+
+        if show_windows:
+            cv.imshow(color, threshold)
+
+    return color_values
 
 
 if __name__ == "__main__":
