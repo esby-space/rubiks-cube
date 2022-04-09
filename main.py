@@ -18,6 +18,9 @@ def main() -> None:
     start_point = (math.floor((img.shape[1] - length) / 2), margin)
     end_point = (math.floor((img.shape[1] + length) / 2), img.shape[0] - margin)
 
+    # cube variables!
+    cube_string = ""
+
     # main loop
     while True:
         ret, img = cam.read()
@@ -30,10 +33,13 @@ def main() -> None:
 
         if k % 256 == 32:
             # SPACE pressed
-            colors = get_face_colors(img, start_point, end_point)
-            print(colors)
+            cube_string += get_face_colors(img, start_point, end_point)
+            print(cube_string)
 
-        img = draw_cube(img, start_point, end_point)
+            if len(cube_string) == 54:
+                print(kc.solve(cube_string))
+
+        img = draw_grid(img, start_point, end_point)
         cv.imshow("esby rubik's cube solver :D", img)
 
     # close everything
@@ -41,7 +47,7 @@ def main() -> None:
     cv.destroyAllWindows()
 
 
-def draw_cube(img, start: Tuple[int, int], end: Tuple[int, int]):
+def draw_grid(img, start: Tuple[int, int], end: Tuple[int, int]):
     """draws a cube overlay into the image"""
 
     start_x, start_y = start
@@ -65,9 +71,12 @@ def get_face_colors(img, start: Tuple[int, int], end: Tuple[int, int]) -> str:
     dif_y = math.ceil((end_y - start_y) / 3)
 
     color_string = ""
+    # iterate over all the squares in the rubik's face
     for i in range(start_y, end_y, dif_y):
         for j in range(start_x, end_x, dif_x):
-            color_symbol = get_color(img[i : i + dif_y, j : j + dif_x])[0].upper()
+            # only get the main color of one square on the face
+            square = img[i : i + dif_y - 1, j : j + dif_x - 1]
+            color_symbol = get_color(square)[0].upper()
             color_string += color_symbol
 
     return color_string
@@ -87,8 +96,13 @@ def get_color(img) -> str:
     return main_color
 
 
-def get_color_values(img, show_windows=False) -> Dict[str, int]:
+def get_color_values(img) -> Dict[str, int]:
     """Gets the color from a given image"""
+    # image filtering idk
+    img = cv.bilateralFilter(img, 9, 75, 75)
+    img = cv.fastNlMeansDenoisingColored(img, None, 10, 10, 7, 21)
+
+    # convert to hsv, works better for color thresholds
     hsv_img = cv.cvtColor(img, cv.COLOR_BGR2HSV)
     color_values: Dict[str, int] = {}
 
@@ -97,9 +111,6 @@ def get_color_values(img, show_windows=False) -> Dict[str, int]:
         upper = np.array(colors[color][1], np.uint8)
         threshold = cv.inRange(hsv_img, lower, upper)
         color_values[color] = threshold.sum()
-
-        if show_windows:
-            cv.imshow(color, threshold)
 
     return color_values
 
