@@ -34,7 +34,7 @@ def main() -> None:
         if k % 256 == 32:
             # SPACE pressed
             cube_string += get_face_colors(img, start_point, end_point)
-            print(cube_string)
+            prompt(math.floor(len(cube_string) / 9), cube_string)
 
             if len(cube_string) == 54:
                 print(kc.solve(cube_string))
@@ -45,22 +45,6 @@ def main() -> None:
     # close everything
     cam.release()
     cv.destroyAllWindows()
-
-
-def draw_grid(img, start: Tuple[int, int], end: Tuple[int, int]):
-    """draws a cube overlay into the image"""
-
-    start_x, start_y = start
-    end_x, end_y = end
-    dif_x = math.ceil((end_x - start_x) / 3)
-    dif_y = math.ceil((end_y - start_y) / 3)
-
-    for i in range(start_x, end_x + dif_x, dif_x):
-        img = cv.line(img, (i, start_y), (i, end_y), (0, 0, 0), 2)
-    for i in range(start_y, end_y + dif_y, dif_y):
-        img = cv.line(img, (start_x, i), (end_x, i), (0, 0, 0), 2)
-
-    return img
 
 
 def get_face_colors(img, start: Tuple[int, int], end: Tuple[int, int]) -> str:
@@ -75,7 +59,7 @@ def get_face_colors(img, start: Tuple[int, int], end: Tuple[int, int]) -> str:
     for i in range(start_y, end_y, dif_y):
         for j in range(start_x, end_x, dif_x):
             # only get the main color of one square on the face
-            square = img[i : i + dif_y - 1, j : j + dif_x - 1]
+            square = img[i : i + dif_y, j : j + dif_x]
             color_symbol = get_color(square)[0].upper()
             color_string += color_symbol
 
@@ -92,6 +76,9 @@ def get_color(img) -> str:
         if value > largest_value:
             main_color = color
             largest_value = value
+
+    if main_color is None:
+        main_color = "none"
 
     return main_color
 
@@ -113,6 +100,31 @@ def get_color_values(img) -> Dict[str, int]:
         color_values[color] = threshold.sum()
 
     return color_values
+
+
+def prompt(face_number: int, cube_string: str) -> None:
+    print(
+        f"""
+        --- SCANNING FACE {face_number} / 6 ---
+        Current cube string: {cube_string}
+    """
+    )
+
+
+def draw_grid(img, start: Tuple[int, int], end: Tuple[int, int]):
+    """draws a cube overlay into the image"""
+
+    start_x, start_y = start
+    end_x, end_y = end
+    dif_x = math.ceil((end_x - start_x) / 3)
+    dif_y = math.ceil((end_y - start_y) / 3)
+
+    for i in range(start_x, end_x + dif_x, dif_x):
+        img = cv.line(img, (i, start_y), (i, end_y), (0, 0, 0), 2)
+    for i in range(start_y, end_y + dif_y, dif_y):
+        img = cv.line(img, (start_x, i), (end_x, i), (0, 0, 0), 2)
+
+    return img
 
 
 if __name__ == "__main__":
